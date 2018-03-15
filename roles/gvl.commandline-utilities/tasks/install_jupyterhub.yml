@@ -1,6 +1,6 @@
 - name: Make sure apt up to date
   apt: update_cache=yes
-  sudo_user: root
+  become: yes
   ignore_errors: yes
 
 - name: "Get and install latest pip3"
@@ -13,23 +13,19 @@
     - nodejs-legacy
     - python3-pip
     - libfreetype6-dev # for matplotlib
-  sudo: yes
-  sudo_user: root
+  become: yes
 
 - name: "Install ipython"
   pip: name=ipython state=present version=5.5.0   # note this needs to be pip not pip3
-  sudo: yes
-  sudo_user: root
+  become: yes
 
 - name: "Install ipykernel, JupyterHub Python2 kernel dependency"
   pip: name=ipykernel state=present version=4.6.1  # note this needs to be pip not pip3
-  sudo: yes
-  sudo_user: root
+  become: yes
 
 - name: "Install JupyterHub node packages"
   npm: name=configurable-http-proxy global=yes version="{{ configurable_http_proxy_version }}"
-  sudo: yes
-  sudo_user: root
+  become: yes
 
 - name: "Install JupyterHub dependencies"
   pip: name={{ item.name }} executable=pip3 state=present version={{ item.version }}
@@ -39,33 +35,35 @@
     - { name: "scipy", version: "{{ scipy_version }}" }
     - { name: "pandas", version: "{{ pandas_version }}" }
     - { name: "jupyterhub", version: "{{ jupyterhub_version }}" }
-  sudo: yes
-  sudo_user: root
+  become: yes
 
 - name: Set up JupyterHub NGINX redirect
   template: src=jupyterhub.locations dest="{{ nginx_sites_dir }}"
-  sudo_user: root
+  become: yes
 
 - name: Reload NGINX
   service: name=nginx state=reloaded
-  sudo_user: root
+  become: yes
 
 - name: Create JupyterHub configuration directory
   file:
     path: "/etc/jupyterhub"
     state: "directory"
     mode: "0755"
+  become: yes
 
 - name: Write out the JupyterHub config
   template: src=jupyterhub_config.py dest="/etc/jupyterhub/jupyterhub_config.py"
+  become: yes
 
 - name: Install JupyterHub Python2 kernel
   command: python2 -m IPython kernelspec install-self
-  sudo_user: root
-  sudo: yes
+  become: yes
 
 - name: Configure JupyterHub to run as a systemd service
   copy: src=jupyterhub.service dest=/etc/systemd/system/jupyterhub.service
+  become: yes
 
 - name: Start the JupyterHub service
-  service: name=jupyterhub state=started
+  service: name=jupyterhub state=started enabled=yes
+  become: yes

@@ -7,4 +7,4 @@
 
 - name: Write out README file for new user
   template: src=README.txt dest=/home/{{ new_user }} owner="{{ new_user }}" group="{{ new_user }}"
-  sudo_user: "{{ new_user }}"
+  become_user: "{{ new_user }}"
