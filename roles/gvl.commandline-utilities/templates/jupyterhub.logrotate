@@ -1,0 +1,6 @@
+/var/log/jupyterhub/jupyterhub.log {
+  missingok
+  size 100M
+  rotate 7
+  compress
+}

@@ -2,8 +2,8 @@
 nginx_conf_dir: /etc/nginx
 nginx_sites_dir: "{{ nginx_conf_dir }}/sites-enabled"
 
-rstudio_version: 1.1.383
-rstudio_package_url: "http://download2.rstudio.org/rstudio-server-{{ rstudio_version }}-amd64.deb"
+rstudio_version: 1.2.1335
+rstudio_package_url: "https://download2.rstudio.org/server/trusty/amd64/rstudio-server-{{ rstudio_version }}-amd64.deb"
 rstudio_local_tmp_package: /tmp/rstudio-server.deb
 
 modules_home: /usr/share/modules/modulefiles
@@ -11,12 +11,14 @@ modules_home: /usr/share/modules/modulefiles
 jupyterhub_location: /jupyter/
 jupyterhub_port: 9510
 # jupyter dependent versions
-jupyterhub_version: 0.8.1
-configurable_http_proxy_version: 3.1.0
-ipython_notebook_version: 6.2.1
-matplotlib_version: 2.1.0
-scipy_version: 1.0.0
-pandas_version: 0.21.0
+jupyterhub_version: 0.9.6
+configurable_http_proxy_version: 4.1.0
+ipython_version: 7.4.0
+ipython_kernel_version: 5.1.0
+ipython_notebook_version: 5.7.8
+matplotlib_version: 3.0.3
+scipy_version: 1.2.1
+pandas_version: 0.24.2
 
 new_user: researcher
 use_ubuntu_password: "yes"

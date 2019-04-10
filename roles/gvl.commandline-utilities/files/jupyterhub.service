@@ -2,8 +2,8 @@
 Description=Jupyterhub
 
 [Service]
-ExecStart=/usr/local/bin/jupyterhub --no-ssl -f /etc/jupyterhub/jupyterhub_config.py
-WorkingDirectory=/etc/jupyterhub
+ExecStartPre=/bin/sh -c "mkdir -p -m 0775 /var/log/jupyterhub"
+ExecStart=/bin/sh -c "/usr/local/bin/jupyterhub --no-ssl -f /etc/jupyterhub/jupyterhub_config.py > /var/log/jupyterhub/jupyterhub.log 2>&1"
 
 [Install]
 WantedBy=multi-user.target

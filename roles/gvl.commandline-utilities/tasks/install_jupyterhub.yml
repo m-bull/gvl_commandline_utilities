@@ -4,33 +4,57 @@
   ignore_errors: yes
 
 - name: "Get and install latest pip3"
-  shell: wget https://bootstrap.pypa.io/get-pip.py && python3 ./get-pip.py
+  apt:
+    name: python3-pip
+    state: latest
+  become: yes
 
 - name: "Install JupyterHub required packages"
-  apt: name={{ item }}
-  with_items:
-    - npm
-    - nodejs-legacy
-    - python3-pip
-    - libfreetype6-dev # for matplotlib
+  apt: 
+    name: ['npm', 'nodejs-legacy', 'python3-pip', 'libfreetype6-dev']
+  become: yes
+
+- name: "Update node packages"
+  npm:
+    name: n
+    global: yes
+  become: yes
+
+- name: "Install latest stable node"
+  command: "n stable"
   become: yes
 
 - name: "Install ipython"
-  pip: name=ipython state=present version=5.5.0   # note this needs to be pip not pip3
+  pip: 
+    name: ipython
+    state: present 
+    version: "{{ ipython_version }}"
+    executable: /usr/bin/pip3
   become: yes
 
-- name: "Install ipykernel, JupyterHub Python2 kernel dependency"
-  pip: name=ipykernel state=present version=4.6.1  # note this needs to be pip not pip3
+- name: "Install ipykernel"
+  pip: 
+    name: ipykernel 
+    state: present 
+    version: "{{ ipython_kernel_version }}"
+    executable: /usr/bin/pip3
   become: yes
 
 - name: "Install JupyterHub node packages"
-  npm: name=configurable-http-proxy global=yes version="{{ configurable_http_proxy_version }}"
+  npm: 
+    name: configurable-http-proxy 
+    global: yes 
+    version: "{{ configurable_http_proxy_version }}"
   become: yes
 
 - name: "Install JupyterHub dependencies"
-  pip: name={{ item.name }} executable=pip3 state=present version={{ item.version }}
+  pip: 
+    name: "{{ item.name }}"
+    state: present 
+    version: "{{ item.version }}"
+    executable: /usr/bin/pip3
   with_items:
-    - { name: "ipython[notebook]", version: "{{ ipython_notebook_version }}" }
+    - { name: "notebook", version: "{{ ipython_notebook_version }}" }
     - { name: "matplotlib", version: "{{ matplotlib_version }}" }
     - { name: "scipy", version: "{{ scipy_version }}" }
     - { name: "pandas", version: "{{ pandas_version }}" }
@@ -38,11 +62,15 @@
   become: yes
 
 - name: Set up JupyterHub NGINX redirect
-  template: src=jupyterhub.locations dest="{{ nginx_sites_dir }}"
+  template: 
+    src: jupyterhub.locations 
+    dest: "{{ nginx_sites_dir }}"
   become: yes
 
 - name: Reload NGINX
-  service: name=nginx state=reloaded
+  service: 
+    name: nginx 
+    state: reloaded
   become: yes
 
 - name: Create JupyterHub configuration directory
@@ -53,17 +81,30 @@
   become: yes
 
 - name: Write out the JupyterHub config
-  template: src=jupyterhub_config.py dest="/etc/jupyterhub/jupyterhub_config.py"
+  template: 
+    src: jupyterhub_config.py
+    dest: "/etc/jupyterhub/jupyterhub_config.py"
   become: yes
 
-- name: Install JupyterHub Python2 kernel
-  command: python2 -m IPython kernelspec install-self
+- name: Configure logrotate for Jupterhub
+  template:
+    src: jupyterhub.logrotate
+    dest: /etc/logrotate.d/jupyterhub
   become: yes
 
+#- name: Install JupyterHub Python2 kernel
+#  command: python2 -m IPython kernelspec install-self
+#  become: yes
+#
 - name: Configure JupyterHub to run as a systemd service
-  copy: src=jupyterhub.service dest=/etc/systemd/system/jupyterhub.service
+  copy: 
+    src: jupyterhub.service 
+    dest: /etc/systemd/system/jupyterhub.service
   become: yes
 
 - name: Start the JupyterHub service
-  service: name=jupyterhub state=started enabled=yes
+  service: 
+    name: jupyterhub 
+    state: started 
+    enabled: yes
   become: yes
