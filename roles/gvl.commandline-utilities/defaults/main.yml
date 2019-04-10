@@ -27,6 +27,6 @@ user_shell: /bin/bash
 
 cloudman_config_file: /opt/cloudman/boot/userData.yaml
 
-gvl_cmdlineutils_version: "4.3.0"
+gvl_cmdlineutils_version: "4.4.0"
 gvl_cmdlineutils_build_date: "{{ ansible_date_time.iso8601 }}"
 gvl_install_path: /opt/gvl
